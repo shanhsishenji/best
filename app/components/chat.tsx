@@ -636,19 +636,21 @@ export function ChatActions(props: {
           text={Locale.Chat.InputActions.Masks}
           icon={<MaskIcon />}
         />
-        {config.pluginConfig.enable &&
-          /^gpt(?!.*03\d{2}$).*$/.test(currentModel) &&
-          currentModel != "gpt-4-vision-preview" && (
-            <ChatAction
-              onClick={switchUsePlugins}
-              text={
-                usePlugins
-                  ? Locale.Chat.InputActions.DisablePlugins
-                  : Locale.Chat.InputActions.EnablePlugins
-              }
-              icon={usePlugins ? <EnablePluginIcon /> : <DisablePluginIcon />}
-            />
-          )}
+   {/* 
+  {config.pluginConfig.enable &&
+    /^gpt(?!.*03\d{2}$).*$/.test(currentModel) &&
+    currentModel != "gpt-4-vision-preview" && (
+      <ChatAction
+        onClick={switchUsePlugins}
+        text={
+          usePlugins
+            ? Locale.Chat.InputActions.DisablePlugins
+            : Locale.Chat.InputActions.EnablePlugins
+        }
+        icon={usePlugins ? <EnablePluginIcon /> : <DisablePluginIcon />}
+      />
+    )}
+*/}
 
         <ChatAction
           onClick={() => setShowModelSelector(true)}
