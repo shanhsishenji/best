@@ -39,17 +39,7 @@ const DEFAULT_ALIBABA_URL = isApp
   ? DEFAULT_API_HOST + "/api/proxy/alibaba"
   : ApiPath.Alibaba;
 
-const DEFAULT_TENCENT_URL = isApp
-  ? DEFAULT_API_HOST + "/api/proxy/tencent"
-  : ApiPath.Tencent;
-
-const DEFAULT_MOONSHOT_URL = isApp
-  ? DEFAULT_API_HOST + "/api/proxy/moonshot"
-  : ApiPath.Moonshot;
-
-const DEFAULT_STABILITY_URL = isApp
-  ? DEFAULT_API_HOST + "/api/proxy/stability"
-  : ApiPath.Stability;
+console.log("DEFAULT_ANTHROPIC_URL", DEFAULT_ANTHROPIC_URL);
 
 const DEFAULT_ACCESS_STATE = {
   accessCode: "",
@@ -64,7 +54,7 @@ const DEFAULT_ACCESS_STATE = {
   // azure
   azureUrl: "",
   azureApiKey: "",
-  azureApiVersion: "2023-08-01-preview",
+  azureApiVersion: "2024-02-15-preview",
 
   // google ai studio
   googleUrl: DEFAULT_GOOGLE_URL,
@@ -90,19 +80,6 @@ const DEFAULT_ACCESS_STATE = {
   alibabaUrl: DEFAULT_ALIBABA_URL,
   alibabaApiKey: "",
 
-  // moonshot
-  moonshotUrl: DEFAULT_MOONSHOT_URL,
-  moonshotApiKey: "",
-
-  //stability
-  stabilityUrl: DEFAULT_STABILITY_URL,
-  stabilityApiKey: "",
-
-  // tencent
-  tencentUrl: DEFAULT_TENCENT_URL,
-  tencentSecretKey: "",
-  tencentSecretId: "",
-
   // server config
   needCode: true,
   hideUserApiKey: false,
@@ -110,7 +87,13 @@ const DEFAULT_ACCESS_STATE = {
   disableGPT4: false,
   disableFastLink: false,
   customModels: "",
+  isEnableRAG: false,
   defaultModel: "",
+
+  // tts config
+  edgeTTSVoiceName: "zh-CN-YunxiNeural",
+
+  isUseOpenAIEndpointForAllModels: false,
 };
 
 export const useAccessStore = createPersistStore(
@@ -121,6 +104,24 @@ export const useAccessStore = createPersistStore(
       this.fetch();
 
       return get().needCode;
+    },
+
+    useOpenAIEndpointForAllModels() {
+      this.fetch();
+
+      return get().isUseOpenAIEndpointForAllModels;
+    },
+
+    edgeVoiceName() {
+      this.fetch();
+
+      return get().edgeTTSVoiceName;
+    },
+
+    enableRAG() {
+      this.fetch();
+
+      return get().isEnableRAG;
     },
 
     isValidOpenAI() {
@@ -151,14 +152,6 @@ export const useAccessStore = createPersistStore(
       return ensure(get(), ["alibabaApiKey"]);
     },
 
-    isValidTencent() {
-      return ensure(get(), ["tencentSecretKey", "tencentSecretId"]);
-    },
-
-    isValidMoonshot() {
-      return ensure(get(), ["moonshotApiKey"]);
-    },
-
     isAuthorized() {
       this.fetch();
 
@@ -171,8 +164,6 @@ export const useAccessStore = createPersistStore(
         this.isValidBaidu() ||
         this.isValidByteDance() ||
         this.isValidAlibaba() ||
-        this.isValidTencent ||
-        this.isValidMoonshot() ||
         !this.enabledAccessControl() ||
         (this.enabledAccessControl() && ensure(get(), ["accessCode"]))
       );
@@ -219,7 +210,8 @@ export const useAccessStore = createPersistStore(
           googleApiKey: string;
         };
         state.openaiApiKey = state.token;
-        state.azureApiVersion = "2023-08-01-preview";
+        state.azureApiVersion = "2024-02-15-preview";
+        state.googleApiKey = state.token;
       }
 
       return persistedState as any;

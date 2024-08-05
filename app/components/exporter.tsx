@@ -1,5 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
-import { ChatMessage, ModelType, useAppConfig, useChatStore } from "../store";
+import {
+  ChatMessage,
+  ModelType,
+  useAccessStore,
+  useAppConfig,
+  useChatStore,
+} from "../store";
 import Locale from "../locales";
 import styles from "./exporter.module.scss";
 import {
@@ -276,7 +282,7 @@ export function RenderExport(props: {
       return {
         id: i.toString(),
         role: role as any,
-        content: role === "user" ? v.textContent ?? "" : v.innerHTML,
+        content: role === "user" ? (v.textContent ?? "") : v.innerHTML,
         date: "",
       };
     });
@@ -466,7 +472,9 @@ export function ImagePreviewer(props: {
     const isApp = getClientConfig()?.isApp;
 
     try {
-      const blob = await toPng(dom);
+      const blob = await toPng(dom, {
+        includeQueryParams: true,
+      });
       if (!blob) return;
 
       if (isMobile || (isApp && window.__TAURI__)) {
@@ -514,6 +522,18 @@ export function ImagePreviewer(props: {
     if (dom) {
       dom.innerHTML = dom.innerHTML; // Refresh the content of the preview by resetting its HTML for fix a bug glitching
     }
+  };
+
+  const markdownImageUrlCorsProcess = (markdownContent: string) => {
+    const updatedContent = markdownContent.replace(
+      /!\[.*?\]\((.*?)\)/g,
+      (match, url) => {
+        if (!url.startsWith("http")) return `![image](${url})`;
+        const updatedURL = `/api/cors?url=${encodeURIComponent(url)}`;
+        return `![image](${updatedURL})`;
+      },
+    );
+    return updatedContent;
   };
 
   return (
@@ -583,7 +603,6 @@ export function ImagePreviewer(props: {
                 <Markdown
                   content={getMessageTextContent(m)}
                   fontSize={config.fontSize}
-                  fontFamily={config.fontFamily}
                   defaultShow
                 />
                 {getMessageImages(m).length == 1 && (

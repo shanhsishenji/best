@@ -8,8 +8,8 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "MOSS",
-    "version": "2.14.0"
+    "productName": "NextChat",
+    "version": "2.13.1"
   },
   "tauri": {
     "allowlist": {
@@ -68,7 +68,7 @@
         "icons/icon.ico"
       ],
       "identifier": "com.yida.chatgpt.next.web",
-      "longDescription": "MOSS is a cross-platform ChatGPT client, including Web/Win/Linux/OSX/PWA.",
+      "longDescription": "NextChat is a cross-platform ChatGPT client, including Web/Win/Linux/OSX/PWA.",
       "macOS": {
         "entitlements": null,
         "exceptionDomain": "",
@@ -77,7 +77,7 @@
         "signingIdentity": null
       },
       "resources": [],
-      "shortDescription": "MOSS App",
+      "shortDescription": "NextChat App",
       "targets": "all",
       "windows": {
         "certificateThumbprint": null,
@@ -92,20 +92,20 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=fSV_jdOILp-cuKhE_KloBcK3gAjAaC9G&authKey=e7nRdGEM8HEDl%2B4sJdpRLkL8IjBwHXkS9VGdDl4Mj6i%2BNfwAilBaNehvzYzzidWj&noverify=0&group_code=817377776/releases/latest/download/latest.json"
+        "https://github.com/Hk-Gosuto/ChatGPT-Next-Web-LangChain/releases/latest/download/latest.json"
       ],
       "dialog": false,
       "windows": {
         "installMode": "passive"
       },
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IERFNDE4MENFM0Y1RTZBOTQKUldTVWFsNC96b0JCM3RqM2NmMnlFTmxIaStRaEJrTHNOU2VqRVlIV1hwVURoWUdVdEc1eDcxVEYK"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlFREQ3RDg3OUQxMzBERDIKUldUU0RST2RoMzNkbnRVNTVWdmtaQkgzaWdoVTVCNVMwUVVYR3BxNmJNOWtjcTE5VlBxNnVLdXcK"
     },
     "windows": [
       {
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "MOSS",
+        "title": "NextChat",
         "width": 960,
         "hiddenTitle": true,
         "titleBarStyle": "Overlay"

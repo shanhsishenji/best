@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { showToast } from "./components/ui-lib";
 import Locale from "./locales";
 import { RequestMessage } from "./client/api";
+import { DEFAULT_MODELS } from "./constant";
 
 export function trimTopic(topic: string) {
   // Fix an issue where double quotes still show in the Indonesian language
@@ -194,7 +195,6 @@ export function autoGrowTextArea(dom: HTMLTextAreaElement) {
   measureDom.style.width = width + "px";
   measureDom.innerText = dom.value !== "" ? dom.value : "1";
   measureDom.style.fontSize = dom.style.fontSize;
-  measureDom.style.fontFamily = dom.style.fontFamily;
   const endWithEmptyLine = dom.value.endsWith("\n");
   const height = parseFloat(window.getComputedStyle(measureDom).height);
   const singleLineHeight = parseFloat(
@@ -264,5 +264,21 @@ export function isVisionModel(model: string) {
 
   return (
     visionKeywords.some((keyword) => model.includes(keyword)) || isGpt4Turbo
+  );
+}
+
+export function isSupportRAGModel(modelName: string) {
+  const specialModels = [
+    "gpt-4-turbo",
+    "gpt-4-turbo-2024-04-09",
+    "gpt-4o",
+    "gpt-4o-2024-05-13",
+    "gpt-4o-mini",
+    "gpt-4o-mini-2024-07-18",
+  ];
+  if (specialModels.some((keyword) => modelName === keyword)) return true;
+  if (isVisionModel(modelName)) return false;
+  return DEFAULT_MODELS.filter((model) => model.provider.id === "openai").some(
+    (model) => model.name === modelName,
   );
 }

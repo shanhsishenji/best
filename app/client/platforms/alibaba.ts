@@ -8,11 +8,15 @@ import {
 import { useAccessStore, useAppConfig, useChatStore } from "@/app/store";
 
 import {
+  AgentChatOptions,
   ChatOptions,
+  CreateRAGStoreOptions,
   getHeaders,
   LLMApi,
   LLMModel,
   MultimodalContent,
+  SpeechOptions,
+  TranscriptionOptions,
 } from "../api";
 import Locale from "../../locales";
 import {
@@ -53,6 +57,18 @@ interface RequestPayload {
 }
 
 export class QwenApi implements LLMApi {
+  speech(options: SpeechOptions): Promise<ArrayBuffer> {
+    throw new Error("Method not implemented.");
+  }
+  transcription(options: TranscriptionOptions): Promise<string> {
+    throw new Error("Method not implemented.");
+  }
+  toolAgentChat(options: AgentChatOptions): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  createRAGStore(options: CreateRAGStoreOptions): Promise<string> {
+    throw new Error("Method not implemented.");
+  }
   path(path: string): string {
     const accessStore = useAccessStore.getState();
 

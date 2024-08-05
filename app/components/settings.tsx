@@ -54,10 +54,8 @@ import {
   Anthropic,
   Azure,
   Baidu,
-  Tencent,
   ByteDance,
   Alibaba,
-  Moonshot,
   Google,
   GoogleSafetySettingsThreshold,
   OPENAI_BASE_URL,
@@ -67,7 +65,6 @@ import {
   ServiceProvider,
   SlotID,
   UPDATE_URL,
-  Stability,
 } from "../constant";
 import { Prompt, SearchService, usePromptStore } from "../store/prompt";
 import { ErrorBoundary } from "./error";
@@ -77,8 +74,11 @@ import { Avatar, AvatarPicker } from "./emoji";
 import { getClientConfig } from "../config/client";
 import { useSyncStore } from "../store/sync";
 import { nanoid } from "nanoid";
+import { PluginConfigList } from "./plugin-config";
 import { useMaskStore } from "../store/mask";
 import { ProviderType } from "../utils/cloud";
+import { TTSConfigList } from "./tts-config";
+import { STTConfigList } from "./stt-config";
 
 function EditPromptModal(props: { id: string; onClose: () => void }) {
   const promptStore = usePromptStore();
@@ -966,57 +966,6 @@ export function Settings() {
     </>
   );
 
-  const tencentConfigComponent = accessStore.provider ===
-    ServiceProvider.Tencent && (
-    <>
-      <ListItem
-        title={Locale.Settings.Access.Tencent.Endpoint.Title}
-        subTitle={Locale.Settings.Access.Tencent.Endpoint.SubTitle}
-      >
-        <input
-          type="text"
-          value={accessStore.tencentUrl}
-          placeholder={Tencent.ExampleEndpoint}
-          onChange={(e) =>
-            accessStore.update(
-              (access) => (access.tencentUrl = e.currentTarget.value),
-            )
-          }
-        ></input>
-      </ListItem>
-      <ListItem
-        title={Locale.Settings.Access.Tencent.ApiKey.Title}
-        subTitle={Locale.Settings.Access.Tencent.ApiKey.SubTitle}
-      >
-        <PasswordInput
-          value={accessStore.tencentSecretId}
-          type="text"
-          placeholder={Locale.Settings.Access.Tencent.ApiKey.Placeholder}
-          onChange={(e) => {
-            accessStore.update(
-              (access) => (access.tencentSecretId = e.currentTarget.value),
-            );
-          }}
-        />
-      </ListItem>
-      <ListItem
-        title={Locale.Settings.Access.Tencent.SecretKey.Title}
-        subTitle={Locale.Settings.Access.Tencent.SecretKey.SubTitle}
-      >
-        <PasswordInput
-          value={accessStore.tencentSecretKey}
-          type="text"
-          placeholder={Locale.Settings.Access.Tencent.SecretKey.Placeholder}
-          onChange={(e) => {
-            accessStore.update(
-              (access) => (access.tencentSecretKey = e.currentTarget.value),
-            );
-          }}
-        />
-      </ListItem>
-    </>
-  );
-
   const byteDanceConfigComponent = accessStore.provider ===
     ServiceProvider.ByteDance && (
     <>
@@ -1095,84 +1044,6 @@ export function Settings() {
     </>
   );
 
-  const moonshotConfigComponent = accessStore.provider ===
-    ServiceProvider.Moonshot && (
-    <>
-      <ListItem
-        title={Locale.Settings.Access.Moonshot.Endpoint.Title}
-        subTitle={
-          Locale.Settings.Access.Moonshot.Endpoint.SubTitle +
-          Moonshot.ExampleEndpoint
-        }
-      >
-        <input
-          type="text"
-          value={accessStore.moonshotUrl}
-          placeholder={Moonshot.ExampleEndpoint}
-          onChange={(e) =>
-            accessStore.update(
-              (access) => (access.moonshotUrl = e.currentTarget.value),
-            )
-          }
-        ></input>
-      </ListItem>
-      <ListItem
-        title={Locale.Settings.Access.Moonshot.ApiKey.Title}
-        subTitle={Locale.Settings.Access.Moonshot.ApiKey.SubTitle}
-      >
-        <PasswordInput
-          value={accessStore.moonshotApiKey}
-          type="text"
-          placeholder={Locale.Settings.Access.Moonshot.ApiKey.Placeholder}
-          onChange={(e) => {
-            accessStore.update(
-              (access) => (access.moonshotApiKey = e.currentTarget.value),
-            );
-          }}
-        />
-      </ListItem>
-    </>
-  );
-
-  const stabilityConfigComponent = accessStore.provider ===
-    ServiceProvider.Stability && (
-    <>
-      <ListItem
-        title={Locale.Settings.Access.Stability.Endpoint.Title}
-        subTitle={
-          Locale.Settings.Access.Stability.Endpoint.SubTitle +
-          Stability.ExampleEndpoint
-        }
-      >
-        <input
-          type="text"
-          value={accessStore.stabilityUrl}
-          placeholder={Stability.ExampleEndpoint}
-          onChange={(e) =>
-            accessStore.update(
-              (access) => (access.stabilityUrl = e.currentTarget.value),
-            )
-          }
-        ></input>
-      </ListItem>
-      <ListItem
-        title={Locale.Settings.Access.Stability.ApiKey.Title}
-        subTitle={Locale.Settings.Access.Stability.ApiKey.SubTitle}
-      >
-        <PasswordInput
-          value={accessStore.stabilityApiKey}
-          type="text"
-          placeholder={Locale.Settings.Access.Stability.ApiKey.Placeholder}
-          onChange={(e) => {
-            accessStore.update(
-              (access) => (access.stabilityApiKey = e.currentTarget.value),
-            );
-          }}
-        />
-      </ListItem>
-    </>
-  );
-
   return (
     <ErrorBoundary>
       <div className="window-header" data-tauri-drag-region>
@@ -1228,8 +1099,8 @@ export function Settings() {
               checkingUpdate
                 ? Locale.Settings.Update.IsChecking
                 : hasNewVersion
-                ? Locale.Settings.Update.FoundUpdate(remoteId ?? "ERROR")
-                : Locale.Settings.Update.IsLatest
+                  ? Locale.Settings.Update.FoundUpdate(remoteId ?? "ERROR")
+                  : Locale.Settings.Update.IsLatest
             }
           >
             {checkingUpdate ? (
@@ -1317,28 +1188,16 @@ export function Settings() {
           </ListItem>
 
           <ListItem
-            title={Locale.Settings.FontFamily.Title}
-            subTitle={Locale.Settings.FontFamily.SubTitle}
-          >
-            <input
-              type="text"
-              value={config.fontFamily}
-              placeholder={Locale.Settings.FontFamily.Placeholder}
-              onChange={(e) =>
-                updateConfig(
-                  (config) => (config.fontFamily = e.currentTarget.value),
-                )
-              }
-            ></input>
-          </ListItem>
-
-          <ListItem
             title={Locale.Settings.AutoGenerateTitle.Title}
             subTitle={Locale.Settings.AutoGenerateTitle.SubTitle}
           >
             <input
               type="checkbox"
-              checked={config.enableAutoGenerateTitle}
+              disabled={!!process.env.NEXT_PUBLIC_DISABLE_AUTOGENERATETITLE}
+              checked={
+                !process.env.NEXT_PUBLIC_DISABLE_AUTOGENERATETITLE &&
+                config.enableAutoGenerateTitle
+              }
               onChange={(e) =>
                 updateConfig(
                   (config) =>
@@ -1472,9 +1331,6 @@ export function Settings() {
                   {baiduConfigComponent}
                   {byteDanceConfigComponent}
                   {alibabaConfigComponent}
-                  {tencentConfigComponent}
-                  {moonshotConfigComponent}
-                  {stabilityConfigComponent}
                 </>
               )}
             </>
@@ -1537,6 +1393,39 @@ export function Settings() {
         {shouldShowPromptModal && (
           <UserPromptModal onClose={() => setShowPromptModal(false)} />
         )}
+
+        <List>
+          <PluginConfigList
+            pluginConfig={config.pluginConfig}
+            updateConfig={(updater) => {
+              const pluginConfig = { ...config.pluginConfig };
+              updater(pluginConfig);
+              config.update((config) => (config.pluginConfig = pluginConfig));
+            }}
+          />
+        </List>
+
+        <List>
+          <TTSConfigList
+            ttsConfig={config.ttsConfig}
+            updateConfig={(updater) => {
+              const ttsConfig = { ...config.ttsConfig };
+              updater(ttsConfig);
+              config.update((config) => (config.ttsConfig = ttsConfig));
+            }}
+          />
+        </List>
+
+        <List>
+          <STTConfigList
+            sttConfig={config.sttConfig}
+            updateConfig={(updater) => {
+              const sttConfig = { ...config.sttConfig };
+              updater(sttConfig);
+              config.update((config) => (config.sttConfig = sttConfig));
+            }}
+          />
+        </List>
 
         <DangerItems />
       </div>

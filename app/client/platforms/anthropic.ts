@@ -1,5 +1,14 @@
 import { ACCESS_CODE_PREFIX, Anthropic, ApiPath } from "@/app/constant";
-import { ChatOptions, getHeaders, LLMApi, MultimodalContent } from "../api";
+import {
+  AgentChatOptions,
+  ChatOptions,
+  CreateRAGStoreOptions,
+  getHeaders,
+  LLMApi,
+  MultimodalContent,
+  SpeechOptions,
+  TranscriptionOptions,
+} from "../api";
 import { useAccessStore, useAppConfig, useChatStore } from "@/app/store";
 import { getClientConfig } from "@/app/config/client";
 import { DEFAULT_API_HOST } from "@/app/constant";
@@ -73,6 +82,18 @@ const ClaudeMapper = {
 const keys = ["claude-2, claude-instant-1"];
 
 export class ClaudeApi implements LLMApi {
+  speech(options: SpeechOptions): Promise<ArrayBuffer> {
+    throw new Error("Method not implemented.");
+  }
+  transcription(options: TranscriptionOptions): Promise<string> {
+    throw new Error("Method not implemented.");
+  }
+  toolAgentChat(options: AgentChatOptions): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  createRAGStore(options: CreateRAGStoreOptions): Promise<string> {
+    throw new Error("Method not implemented.");
+  }
   extractMessage(res: any) {
     console.log("[Response] claude response: ", res);
 

@@ -45,4 +45,7 @@ dev
 *.key
 *.key.pub
 
-masks.json
+/uploads
+.vercel
+
+certificates

@@ -1,20 +1,17 @@
-export const OWNER = "ChatGPTNextWeb";
-export const REPO = "ChatGPT-Next-Web";
-export const REPO_URL = `https://github.com/${OWNER}/${REPO}`;
-export const ISSUE_URL = `https://github.com/${OWNER}/${REPO}/issues`;
+export const OWNER = "shanhsishenji";
+export const REPO = "best";
+export const REPO_URL = `http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=G6BANRFCIMrDmU_G4f9fWK4BGkR3K34E&authKey=KkwCAYFc19hXCfMWuJ%2FHb9dsmuH5yZDPZb%2FrOa%2BWq1xbEVew1tTMWrbUkksLoRrO&noverify=0&group_code=817377776`;
+export const ISSUE_URL = `http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=G6BANRFCIMrDmU_G4f9fWK4BGkR3K34E&authKey=KkwCAYFc19hXCfMWuJ%2FHb9dsmuH5yZDPZb%2FrOa%2BWq1xbEVew1tTMWrbUkksLoRrO&noverify=0&group_code=817377776`;
 export const UPDATE_URL = `${REPO_URL}#keep-updated`;
 export const RELEASE_URL = `${REPO_URL}/releases`;
 export const FETCH_COMMIT_URL = `https://api.github.com/repos/${OWNER}/${REPO}/commits?per_page=1`;
 export const FETCH_TAG_URL = `https://api.github.com/repos/${OWNER}/${REPO}/tags?per_page=1`;
 export const RUNTIME_CONFIG_DOM = "danger-runtime-config";
 
-export const STABILITY_BASE_URL = "https://api.stability.ai";
-
-export const DEFAULT_API_HOST = "https://api.MOSS.dev";
+export const DEFAULT_API_HOST = "https://api.nextchat.dev";
 export const OPENAI_BASE_URL = "https://api.openai.com";
-export const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
-
 export const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/";
+export const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
 
 export const BAIDU_BASE_URL = "https://aip.baidubce.com";
 export const BAIDU_OATUH_URL = `${BAIDU_BASE_URL}/oauth/2.0/token`;
@@ -22,10 +19,6 @@ export const BAIDU_OATUH_URL = `${BAIDU_BASE_URL}/oauth/2.0/token`;
 export const BYTEDANCE_BASE_URL = "https://ark.cn-beijing.volces.com";
 
 export const ALIBABA_BASE_URL = "https://dashscope.aliyuncs.com/api/";
-
-export const TENCENT_BASE_URL = "https://hunyuan.tencentcloudapi.com";
-
-export const MOONSHOT_BASE_URL = "https://api.moonshot.cn";
 
 export const CACHE_URL_PREFIX = "/api/cache";
 export const UPLOAD_URL = `${CACHE_URL_PREFIX}/upload`;
@@ -36,25 +29,20 @@ export enum Path {
   Settings = "/settings",
   NewChat = "/new-chat",
   Masks = "/masks",
+  Plugins = "/plugins",
   Auth = "/auth",
-  Sd = "/sd",
-  SdNew = "/sd-new",
-  Artifacts = "/artifacts",
 }
 
 export enum ApiPath {
   Cors = "",
   Azure = "/api/azure",
   OpenAI = "/api/openai",
+  GoogleAI = "/api/google",
   Anthropic = "/api/anthropic",
   Google = "/api/google",
   Baidu = "/api/baidu",
   ByteDance = "/api/bytedance",
   Alibaba = "/api/alibaba",
-  Tencent = "/api/tencent",
-  Moonshot = "/api/moonshot",
-  Stability = "/api/stability",
-  Artifacts = "/api/artifacts",
 }
 
 export enum SlotID {
@@ -64,11 +52,8 @@ export enum SlotID {
 
 export enum FileName {
   Masks = "masks.json",
+  Plugins = "plugins.json",
   Prompts = "prompts.json",
-}
-
-export enum Plugin {
-  Artifacts = "artifacts",
 }
 
 export enum StoreKey {
@@ -76,10 +61,10 @@ export enum StoreKey {
   Access = "access-control",
   Config = "app-config",
   Mask = "mask-store",
+  Plugin = "plugin-store",
   Prompt = "prompt-store",
   Update = "chat-update",
   Sync = "sync",
-  SdList = "sd-list",
 }
 
 export const DEFAULT_SIDEBAR_WIDTH = 300;
@@ -106,9 +91,6 @@ export enum ServiceProvider {
   Baidu = "Baidu",
   ByteDance = "ByteDance",
   Alibaba = "Alibaba",
-  Tencent = "Tencent",
-  Moonshot = "Moonshot",
-  Stability = "Stability",
 }
 
 // Google API safety settings, see https://ai.google.dev/gemini-api/docs/safety-settings
@@ -121,21 +103,13 @@ export enum GoogleSafetySettingsThreshold {
 }
 
 export enum ModelProvider {
-  Stability = "Stability",
   GPT = "GPT",
   GeminiPro = "GeminiPro",
   Claude = "Claude",
   Ernie = "Ernie",
   Doubao = "Doubao",
   Qwen = "Qwen",
-  Hunyuan = "Hunyuan",
-  Moonshot = "Moonshot",
 }
-
-export const Stability = {
-  GeneratePath: "v2beta/stable-image/generate",
-  ExampleEndpoint: "https://api.stability.ai",
-};
 
 export const Anthropic = {
   ChatPath: "v1/messages",
@@ -146,6 +120,8 @@ export const Anthropic = {
 
 export const OpenaiPath = {
   ChatPath: "v1/chat/completions",
+  SpeechPath: "v1/audio/speech",
+  TranscriptionPath: "v1/audio/transcriptions",
   UsagePath: "dashboard/billing/usage",
   SubsPath: "dashboard/billing/subscription",
   ListModelPath: "v1/models",
@@ -193,15 +169,6 @@ export const Alibaba = {
   ChatPath: "v1/services/aigc/text-generation/generation",
 };
 
-export const Tencent = {
-  ExampleEndpoint: TENCENT_BASE_URL,
-};
-
-export const Moonshot = {
-  ExampleEndpoint: MOONSHOT_BASE_URL,
-  ChatPath: "v1/chat/completions",
-};
-
 export const DEFAULT_INPUT_TEMPLATE = `{{input}}`; // input / time / model / lang
 // export const DEFAULT_SYSTEM_TEMPLATE = `
 // You are ChatGPT, a large language model trained by {{ServiceProvider}}.
@@ -239,6 +206,23 @@ export const KnowledgeCutOffDate: Record<string, string> = {
   "gemini-pro-vision": "2023-12",
 };
 
+export const DEFAULT_TTS_ENGINE = "OpenAI-TTS";
+export const DEFAULT_TTS_ENGINES = ["OpenAI-TTS", "Edge-TTS"];
+export const DEFAULT_TTS_MODEL = "tts-1";
+export const DEFAULT_TTS_VOICE = "alloy";
+export const DEFAULT_TTS_MODELS = ["tts-1", "tts-1-hd"];
+export const DEFAULT_TTS_VOICES = [
+  "alloy",
+  "echo",
+  "fable",
+  "onyx",
+  "nova",
+  "shimmer",
+];
+
+export const DEFAULT_STT_ENGINE = "WebAPI";
+export const DEFAULT_STT_ENGINES = ["WebAPI", "OpenAI Whisper"];
+export const FIREFOX_DEFAULT_STT_ENGINE = "OpenAI Whisper";
 const openaiModels = [
   "gpt-3.5-turbo",
   "gpt-3.5-turbo-1106",
@@ -308,18 +292,6 @@ const alibabaModes = [
   "qwen-max-longcontext",
 ];
 
-const tencentModels = [
-  "hunyuan-pro",
-  "hunyuan-standard",
-  "hunyuan-lite",
-  "hunyuan-role",
-  "hunyuan-functioncall",
-  "hunyuan-code",
-  "hunyuan-vision",
-];
-
-const moonshotModes = ["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"];
-
 export const DEFAULT_MODELS = [
   ...openaiModels.map((name) => ({
     name,
@@ -384,24 +356,6 @@ export const DEFAULT_MODELS = [
       providerType: "alibaba",
     },
   })),
-  ...tencentModels.map((name) => ({
-    name,
-    available: true,
-    provider: {
-      id: "tencent",
-      providerName: "Tencent",
-      providerType: "tencent",
-    },
-  })),
-  ...moonshotModes.map((name) => ({
-    name,
-    available: true,
-    provider: {
-      id: "moonshot",
-      providerName: "Moonshot",
-      providerType: "moonshot",
-    },
-  })),
 ] as const;
 
 export const CHAT_PAGE_SIZE = 15;
@@ -420,4 +374,29 @@ export const internalAllowedWebDavEndpoints = [
   "https://app.koofr.net/dav/Koofr",
 ];
 
-export const PLUGINS = [{ name: "Stable Diffusion", path: Path.Sd }];
+export const MYFILES_BROWSER_TOOLS_SYSTEM_PROMPT = `
+# Tools
+
+## myfiles_browser
+
+You have the tool 'myfiles_browser' with the following functions:
+issues queries to search the file(s) uploaded in the current conversation and displays the results.
+
+This tool is for browsing the files uploaded by the user.
+
+Parts of the documents uploaded by users will be automatically included in the conversation. Only use this tool when the relevant parts don't contain the necessary information to fulfill the user's request.
+
+If the user needs to summarize the document, they can summarize it through parts of the document.
+
+Think carefully about how the information you find relates to the user's request. Respond as soon as you find information that clearly answers the request.
+
+Issue multiple queries to the 'myfiles_browser' command only when the user's question needs to be decomposed to find different facts. In other scenarios, prefer providing a single query. Avoid single-word queries that are extremely broad and will return unrelated results.
+
+Here are some examples of how to use the 'myfiles_browser' command:
+User: What was the GDP of France and Italy in the 1970s? => myfiles_browser(["france gdp 1970", "italy gdp 1970"])
+User: What does the report say about the GPT4 performance on MMLU? => myfiles_browser(["GPT4 MMLU performance"])
+User: How can I integrate customer relationship management system with third-party email marketing tools? => myfiles_browser(["customer management system marketing integration"])
+User: What are the best practices for data security and privacy for our cloud storage services? => myfiles_browser(["cloud storage security and privacy"])
+
+The user has uploaded the following files:
+`;

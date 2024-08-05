@@ -7,18 +7,18 @@ import {
 } from "../constant";
 import { ChatMessage, ModelType, useAccessStore, useChatStore } from "../store";
 import { ChatGPTApi } from "./platforms/openai";
+import { FileApi, FileInfo } from "./platforms/utils";
 import { GeminiProApi } from "./platforms/google";
 import { ClaudeApi } from "./platforms/anthropic";
 import { ErnieApi } from "./platforms/baidu";
 import { DoubaoApi } from "./platforms/bytedance";
 import { QwenApi } from "./platforms/alibaba";
-import { HunyuanApi } from "./platforms/tencent";
-import { MoonshotApi } from "./platforms/moonshot";
 
 export const ROLES = ["system", "user", "assistant"] as const;
 export type MessageRole = (typeof ROLES)[number];
 
 export const Models = ["gpt-3.5-turbo", "gpt-4"] as const;
+export const TTSModels = ["tts-1", "tts-1-hd"] as const;
 export type ChatModel = ModelType;
 
 export interface MultimodalContent {
@@ -32,6 +32,7 @@ export interface MultimodalContent {
 export interface RequestMessage {
   role: MessageRole;
   content: string | MultimodalContent[];
+  fileInfos?: FileInfo[];
 }
 
 export interface LLMConfig {
@@ -44,12 +45,56 @@ export interface LLMConfig {
   frequency_penalty?: number;
 }
 
+export interface LLMAgentConfig {
+  maxIterations: number;
+  returnIntermediateSteps: boolean;
+  useTools?: (string | undefined)[];
+}
+
+export interface SpeechOptions {
+  model: string;
+  input: string;
+  voice: string;
+  response_format?: string;
+  speed?: number;
+  onController?: (controller: AbortController) => void;
+}
+
+export interface TranscriptionOptions {
+  model?: "whisper-1";
+  file: Blob;
+  language?: string;
+  prompt?: string;
+  response_format?: "json" | "text" | "srt" | "verbose_json" | "vtt";
+  temperature?: number;
+  onController?: (controller: AbortController) => void;
+}
+
 export interface ChatOptions {
   messages: RequestMessage[];
   config: LLMConfig;
-
+  onToolUpdate?: (toolName: string, toolInput: string) => void;
   onUpdate?: (message: string, chunk: string) => void;
   onFinish: (message: string) => void;
+  onError?: (err: Error) => void;
+  onController?: (controller: AbortController) => void;
+}
+
+export interface AgentChatOptions {
+  chatSessionId?: string;
+  messages: RequestMessage[];
+  config: LLMConfig;
+  agentConfig: LLMAgentConfig;
+  onToolUpdate?: (toolName: string, toolInput: string) => void;
+  onUpdate?: (message: string, chunk: string) => void;
+  onFinish: (message: string) => void;
+  onError?: (err: Error) => void;
+  onController?: (controller: AbortController) => void;
+}
+
+export interface CreateRAGStoreOptions {
+  chatSessionId: string;
+  fileInfos: FileInfo[];
   onError?: (err: Error) => void;
   onController?: (controller: AbortController) => void;
 }
@@ -74,6 +119,10 @@ export interface LLMModelProvider {
 
 export abstract class LLMApi {
   abstract chat(options: ChatOptions): Promise<void>;
+  abstract speech(options: SpeechOptions): Promise<ArrayBuffer>;
+  abstract transcription(options: TranscriptionOptions): Promise<string>;
+  abstract toolAgentChat(options: AgentChatOptions): Promise<void>;
+  abstract createRAGStore(options: CreateRAGStoreOptions): Promise<string>;
   abstract usage(): Promise<LLMUsage>;
   abstract models(): Promise<LLMModel[]>;
 }
@@ -99,8 +148,15 @@ interface ChatProvider {
   usage: () => void;
 }
 
+export abstract class ToolApi {
+  abstract call(input: string): Promise<string>;
+  abstract name: string;
+  abstract description: string;
+}
+
 export class ClientApi {
   public llm: LLMApi;
+  public file: FileApi;
 
   constructor(provider: ModelProvider = ModelProvider.GPT) {
     switch (provider) {
@@ -118,15 +174,11 @@ export class ClientApi {
         break;
       case ModelProvider.Qwen:
         this.llm = new QwenApi();
-      case ModelProvider.Hunyuan:
-        this.llm = new HunyuanApi();
-        break;
-      case ModelProvider.Moonshot:
-        this.llm = new MoonshotApi();
         break;
       default:
         this.llm = new ChatGPTApi();
     }
+    this.file = new FileApi();
   }
 
   config() {}
@@ -145,7 +197,7 @@ export class ClientApi {
         {
           from: "human",
           value:
-            "Share from [MOSS]: https://github.com/Yidadaa/ChatGPT-Next-Web",
+            "Share from [NextChat]: https://github.com/Yidadaa/ChatGPT-Next-Web",
         },
       ]);
     // 敬告二开开发者们，为了开源大模型的发展，请不要修改上述消息，此消息用于后续数据清洗使用
@@ -175,26 +227,16 @@ export class ClientApi {
   }
 }
 
-export function getBearerToken(
-  apiKey: string,
-  noBearer: boolean = false,
-): string {
-  return validString(apiKey)
-    ? `${noBearer ? "" : "Bearer "}${apiKey.trim()}`
-    : "";
-}
-
-export function validString(x: string): boolean {
-  return x?.length > 0;
-}
-
-export function getHeaders() {
+export function getHeaders(ignoreHeaders?: boolean) {
   const accessStore = useAccessStore.getState();
   const chatStore = useChatStore.getState();
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  };
+  let headers: Record<string, string> = {};
+  if (!ignoreHeaders) {
+    headers = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+  }
 
   const clientConfig = getClientConfig();
 
@@ -206,21 +248,30 @@ export function getHeaders() {
     const isBaidu = modelConfig.providerName == ServiceProvider.Baidu;
     const isByteDance = modelConfig.providerName === ServiceProvider.ByteDance;
     const isAlibaba = modelConfig.providerName === ServiceProvider.Alibaba;
-    const isMoonshot = modelConfig.providerName === ServiceProvider.Moonshot;
     const isEnabledAccessControl = accessStore.enabledAccessControl();
     const apiKey = isGoogle
       ? accessStore.googleApiKey
       : isAzure
-      ? accessStore.azureApiKey
-      : isAnthropic
-      ? accessStore.anthropicApiKey
-      : isByteDance
-      ? accessStore.bytedanceApiKey
-      : isAlibaba
-      ? accessStore.alibabaApiKey
-      : isMoonshot
-      ? accessStore.moonshotApiKey
-      : accessStore.openaiApiKey;
+        ? accessStore.azureApiKey
+        : isAnthropic
+          ? accessStore.anthropicApiKey
+          : isByteDance
+            ? accessStore.bytedanceApiKey
+            : isAlibaba
+              ? accessStore.alibabaApiKey
+              : accessStore.openaiApiKey;
+    if (accessStore.isUseOpenAIEndpointForAllModels) {
+      return {
+        isGoogle: false,
+        isAzure: false,
+        isAnthropic: false,
+        isBaidu: false,
+        isByteDance: false,
+        isAlibaba: false,
+        apiKey: accessStore.openaiApiKey,
+        isEnabledAccessControl,
+      };
+    }
     return {
       isGoogle,
       isAzure,
@@ -228,7 +279,6 @@ export function getHeaders() {
       isBaidu,
       isByteDance,
       isAlibaba,
-      isMoonshot,
       apiKey,
       isEnabledAccessControl,
     };
@@ -238,6 +288,15 @@ export function getHeaders() {
     return isAzure ? "api-key" : isAnthropic ? "x-api-key" : "Authorization";
   }
 
+  function getBearerToken(apiKey: string, noBearer: boolean = false): string {
+    return validString(apiKey)
+      ? `${noBearer ? "" : "Bearer "}${apiKey.trim()}`
+      : "";
+  }
+
+  function validString(x: string): boolean {
+    return x?.length > 0;
+  }
   const {
     isGoogle,
     isAzure,
@@ -267,6 +326,10 @@ export function getHeaders() {
 }
 
 export function getClientApi(provider: ServiceProvider): ClientApi {
+  const accessStore = useAccessStore.getState();
+  if (accessStore.isUseOpenAIEndpointForAllModels) {
+    return new ClientApi(ModelProvider.GPT);
+  }
   switch (provider) {
     case ServiceProvider.Google:
       return new ClientApi(ModelProvider.GeminiPro);
@@ -278,10 +341,6 @@ export function getClientApi(provider: ServiceProvider): ClientApi {
       return new ClientApi(ModelProvider.Doubao);
     case ServiceProvider.Alibaba:
       return new ClientApi(ModelProvider.Qwen);
-    case ServiceProvider.Tencent:
-      return new ClientApi(ModelProvider.Hunyuan);
-    case ServiceProvider.Moonshot:
-      return new ClientApi(ModelProvider.Moonshot);
     default:
       return new ClientApi(ModelProvider.GPT);
   }

@@ -42,6 +42,8 @@ const cn = {
       PinToastAction: "查看",
       Delete: "删除",
       Edit: "编辑",
+      Speech: "朗读",
+      StopSpeech: "停止",
     },
     Commands: {
       new: "新建聊天",
@@ -63,7 +65,10 @@ const cn = {
       Masks: "所有面具",
       Clear: "清除聊天",
       Settings: "对话设置",
+      EnablePlugins: "开启插件",
+      DisablePlugins: "关闭插件",
       UploadImage: "上传图片",
+      UploadFle: "上传文件",
     },
     Rename: "重命名对话",
     Typing: "正在输入…",
@@ -75,6 +80,8 @@ const cn = {
       return inputHints + "，/ 触发补全，: 触发命令";
     },
     Send: "发送",
+    StartSpeak: "说话",
+    StopSpeak: "停止",
     Config: {
       Reset: "清除记忆",
       SaveAs: "存为面具",
@@ -104,10 +111,6 @@ const cn = {
       Toast: "正在生成截图",
       Modal: "长按或右键保存图片",
     },
-    Artifacts: {
-      Title: "分享页面",
-      Error: "分享失败",
-    },
   },
   Select: {
     Search: "搜索消息",
@@ -128,6 +131,7 @@ const cn = {
     DeleteChat: "确认删除选中的对话？",
     DeleteToast: "已删除会话",
     Revert: "撤销",
+    Search: "搜索聊天",
   },
   Settings: {
     Title: "设置",
@@ -155,11 +159,6 @@ const cn = {
     FontSize: {
       Title: "字体大小",
       SubTitle: "聊天内容的字体大小",
-    },
-    FontFamily: {
-      Title: "聊天字体",
-      SubTitle: "聊天内容的字体，若置空则应用全局默认字体",
-      Placeholder: "字体名称",
     },
     InjectSystemPrompts: {
       Title: "注入系统级提示信息",
@@ -376,22 +375,6 @@ const cn = {
           SubTitle: "不支持自定义前往.env配置",
         },
       },
-      Tencent: {
-        ApiKey: {
-          Title: "API Key",
-          SubTitle: "使用自定义腾讯云API Key",
-          Placeholder: "Tencent API Key",
-        },
-        SecretKey: {
-          Title: "Secret Key",
-          SubTitle: "使用自定义腾讯云Secret Key",
-          Placeholder: "Tencent Secret Key",
-        },
-        Endpoint: {
-          Title: "接口地址",
-          SubTitle: "不支持自定义前往.env配置",
-        },
-      },
       ByteDance: {
         ApiKey: {
           Title: "接口密钥",
@@ -408,28 +391,6 @@ const cn = {
           Title: "接口密钥",
           SubTitle: "使用自定义阿里云API Key",
           Placeholder: "Alibaba Cloud API Key",
-        },
-        Endpoint: {
-          Title: "接口地址",
-          SubTitle: "样例：",
-        },
-      },
-      Moonshot: {
-        ApiKey: {
-          Title: "接口密钥",
-          SubTitle: "使用自定义月之暗面API Key",
-          Placeholder: "Moonshot API Key",
-        },
-        Endpoint: {
-          Title: "接口地址",
-          SubTitle: "样例：",
-        },
-      },
-      Stability: {
-        ApiKey: {
-          Title: "接口密钥",
-          SubTitle: "使用自定义 Stability API Key",
-          Placeholder: "Stability API Key",
         },
         Endpoint: {
           Title: "接口地址",
@@ -463,6 +424,50 @@ const cn = {
       Title: "频率惩罚度 (frequency_penalty)",
       SubTitle: "值越大，越有可能降低重复字词",
     },
+    Plugin: {
+      Enable: {
+        Title: "启用插件",
+        SubTitle: "启用插件调用功能",
+      },
+      MaxIteration: {
+        Title: "最大迭代数",
+        SubTitle: "插件调用最大迭代数",
+      },
+      ReturnIntermediateStep: {
+        Title: "返回中间步骤",
+        SubTitle: "是否返回插件调用的中间步骤",
+      },
+    },
+    TTS: {
+      Enable: {
+        Title: "启用文本转语音",
+        SubTitle: "启用文本生成语音服务",
+      },
+      Autoplay: {
+        Title: "启用自动朗读",
+        SubTitle: "自动生成语音并播放，需先开启文本转语音开关",
+      },
+      Model: "模型",
+      Engine: "转换引擎",
+      Voice: {
+        Title: "声音",
+        SubTitle: "生成语音时使用的声音",
+      },
+      Speed: {
+        Title: "速度",
+        SubTitle: "生成语音的速度",
+      },
+    },
+    STT: {
+      Enable: {
+        Title: "启用语音转文本",
+        SubTitle: "启用语音转文本",
+      },
+      Engine: {
+        Title: "转换引擎",
+        SubTitle: "音频转换引擎",
+      },
+    },
   },
   Store: {
     DefaultTopic: "新的聊天",
@@ -493,10 +498,25 @@ const cn = {
   },
   Plugin: {
     Name: "插件",
-    Artifacts: "Artifacts",
-  },
-  Discovery: {
-    Name: "发现",
+    Page: {
+      Title: "预设插件",
+      SubTitle: (count: number) => `${count} 个预设插件`,
+      Search: "搜索插件",
+      Create: "新建",
+    },
+    Item: {
+      View: "查看",
+      Edit: "编辑",
+      Delete: "删除",
+      DeleteConfirm: "确认删除？",
+    },
+    EditModal: {
+      Title: (readonly: boolean) =>
+        `编辑预设插件 ${readonly ? "（只读）" : ""}`,
+      Download: "下载预设",
+      Clone: "克隆预设",
+    },
+    RuntimeWarning: "仅在非Vercel环境部署时可用",
   },
   FineTuned: {
     Sysmessage: "你是一个助手",
@@ -576,61 +596,6 @@ const cn = {
     Messages: "消息",
     Topic: "主题",
     Time: "时间",
-  },
-  SdPanel: {
-    Prompt: "画面提示",
-    NegativePrompt: "否定提示",
-    PleaseInput: (name: string) => `请输入${name}`,
-    AspectRatio: "横纵比",
-    ImageStyle: "图像风格",
-    OutFormat: "输出格式",
-    AIModel: "AI模型",
-    ModelVersion: "模型版本",
-    Submit: "提交生成",
-    ParamIsRequired: (name: string) => `${name}不能为空`,
-    Styles: {
-      D3Model: "3D模型",
-      AnalogFilm: "模拟电影",
-      Anime: "动漫",
-      Cinematic: "电影风格",
-      ComicBook: "漫画书",
-      DigitalArt: "数字艺术",
-      Enhance: "增强",
-      FantasyArt: "幻想艺术",
-      Isometric: "等角",
-      LineArt: "线描",
-      LowPoly: "低多边形",
-      ModelingCompound: "建模材料",
-      NeonPunk: "霓虹朋克",
-      Origami: "折纸",
-      Photographic: "摄影",
-      PixelArt: "像素艺术",
-      TileTexture: "贴图",
-    },
-  },
-  Sd: {
-    SubTitle: (count: number) => `共 ${count} 条绘画`,
-    Actions: {
-      Params: "查看参数",
-      Copy: "复制提示词",
-      Delete: "删除",
-      Retry: "重试",
-      ReturnHome: "返回首页",
-      History: "查看历史",
-    },
-    EmptyRecord: "暂无绘画记录",
-    Status: {
-      Name: "状态",
-      Success: "成功",
-      Error: "失败",
-      Wait: "等待中",
-      Running: "运行中",
-    },
-    Danger: {
-      Delete: "确认删除？",
-    },
-    GenerateParams: "生成参数",
-    Detail: "详情",
   },
 };
 

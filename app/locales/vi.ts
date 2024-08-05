@@ -71,12 +71,6 @@ const vi: PartialLocaleType = {
       Title: "Font chữ",
       SubTitle: "Thay đổi font chữ của nội dung trò chuyện",
     },
-    FontFamily: {
-      Title: "Phông Chữ Trò Chuyện",
-      SubTitle:
-        "Phông chữ của nội dung trò chuyện, để trống để áp dụng phông chữ mặc định toàn cầu",
-      Placeholder: "Tên Phông Chữ",
-    },
     InjectSystemPrompts: {
       Title: "Tiêm Prompt Hệ thống",
       SubTitle:

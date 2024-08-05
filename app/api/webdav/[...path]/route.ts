@@ -37,13 +37,9 @@ async function handle(
       const normalizedAllowedEndpoint = normalizeUrl(allowedEndpoint);
       const normalizedEndpoint = normalizeUrl(endpoint as string);
 
-      return (
-        normalizedEndpoint &&
+      return normalizedEndpoint &&
         normalizedEndpoint.hostname === normalizedAllowedEndpoint?.hostname &&
-        normalizedEndpoint.pathname.startsWith(
-          normalizedAllowedEndpoint.pathname,
-        )
-      );
+        normalizedEndpoint.pathname.startsWith(normalizedAllowedEndpoint.pathname);
     })
   ) {
     return NextResponse.json(

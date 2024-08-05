@@ -28,7 +28,7 @@ async function handle(
     });
   }
 
-  const bearToken = req.headers.get("Authorization") ?? "";
+  const bearToken = req.headers.get("x-goog-api-key") ?? "";
   const token = bearToken.trim().replaceAll("Bearer ", "").trim();
 
   const apiKey = token ? token : serverConfig.googleApiKey;

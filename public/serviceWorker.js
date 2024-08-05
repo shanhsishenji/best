@@ -15,10 +15,6 @@ self.addEventListener("install", function (event) {
   );
 });
 
-function jsonify(data) {
-  return new Response(JSON.stringify(data), { headers: { 'content-type': 'application/json' } })
-}
-
 async function upload(request, url) {
   const formData = await request.formData()
   const file = formData.getAll('file')[0]
@@ -37,13 +33,13 @@ async function upload(request, url) {
       'server': 'ServiceWorker',
     }
   }))
-  return jsonify({ code: 0, data: fileUrl })
+  return Response.json({ code: 0, data: fileUrl })
 }
 
 async function remove(request, url) {
   const cache = await caches.open(CHATGPT_NEXT_WEB_FILE_CACHE)
   const res = await cache.delete(request.url)
-  return jsonify({ code: 0 })
+  return Response.json({ code: 0 })
 }
 
 self.addEventListener("fetch", (e) => {
@@ -60,3 +56,4 @@ self.addEventListener("fetch", (e) => {
     }
   }
 });
+

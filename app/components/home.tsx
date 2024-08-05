@@ -9,7 +9,7 @@ import styles from "./home.module.scss";
 import BotIcon from "../icons/bot.svg";
 import LoadingIcon from "../icons/three-dots.svg";
 
-import { getCSSVar, useMobileScreen } from "../utils";
+import { useMobileScreen } from "../utils";
 
 import dynamic from "next/dynamic";
 import { Path, SlotID } from "../constant";
@@ -39,10 +39,6 @@ export function Loading(props: { noLogo?: boolean }) {
   );
 }
 
-const Artifacts = dynamic(async () => (await import("./artifacts")).Artifacts, {
-  loading: () => <Loading noLogo />,
-});
-
 const Settings = dynamic(async () => (await import("./settings")).Settings, {
   loading: () => <Loading noLogo />,
 });
@@ -59,40 +55,9 @@ const MaskPage = dynamic(async () => (await import("./mask")).MaskPage, {
   loading: () => <Loading noLogo />,
 });
 
-const Sd = dynamic(async () => (await import("./sd")).Sd, {
+const Plugins = dynamic(async () => (await import("./plugin")).PluginPage, {
   loading: () => <Loading noLogo />,
 });
-
-export function useSwitchTheme() {
-  const config = useAppConfig();
-
-  useEffect(() => {
-    document.body.classList.remove("light");
-    document.body.classList.remove("dark");
-
-    if (config.theme === "dark") {
-      document.body.classList.add("dark");
-    } else if (config.theme === "light") {
-      document.body.classList.add("light");
-    }
-
-    const metaDescriptionDark = document.querySelector(
-      'meta[name="theme-color"][media*="dark"]',
-    );
-    const metaDescriptionLight = document.querySelector(
-      'meta[name="theme-color"][media*="light"]',
-    );
-
-    if (config.theme === "auto") {
-      metaDescriptionDark?.setAttribute("content", "#151515");
-      metaDescriptionLight?.setAttribute("content", "#fafafa");
-    } else {
-      const themeColor = getCSSVar("--theme-color");
-      metaDescriptionDark?.setAttribute("content", themeColor);
-      metaDescriptionLight?.setAttribute("content", themeColor);
-    }
-  }, [config.theme]);
-}
 
 function useHtmlLang() {
   useEffect(() => {
@@ -130,23 +95,11 @@ const loadAsyncGoogleFont = () => {
   document.head.appendChild(linkEl);
 };
 
-export function WindowContent(props: { children: React.ReactNode }) {
-  return (
-    <div className={styles["window-content"]} id={SlotID.AppBody}>
-      {props?.children}
-    </div>
-  );
-}
-
 function Screen() {
   const config = useAppConfig();
   const location = useLocation();
-  const isArtifact = location.pathname.includes(Path.Artifacts);
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
-  const isSd = location.pathname === Path.Sd;
-  const isSdNew = location.pathname === Path.SdNew;
-
   const isMobileScreen = useMobileScreen();
   const shouldTightBorder =
     getClientConfig()?.isApp || (config.tightBorder && !isMobileScreen);
@@ -155,40 +108,68 @@ function Screen() {
     loadAsyncGoogleFont();
   }, []);
 
-  if (isArtifact) {
-    return (
-      <Routes>
-        <Route path="/artifacts/:id" element={<Artifacts />} />
-      </Routes>
+  // SwitchThemeColor
+  // Adapting Safari's theme-color and changing it according to the path
+  useEffect(() => {
+    document.body.classList.remove("light");
+    document.body.classList.remove("dark");
+
+    if (config.theme === "dark") {
+      document.body.classList.add("dark");
+    } else if (config.theme === "light") {
+      document.body.classList.add("light");
+    }
+
+    const metaDescriptionDark = document.querySelector(
+      'meta[name="theme-color"][media*="dark"]',
     );
-  }
-  const renderContent = () => {
-    if (isAuth) return <AuthPage />;
-    if (isSd) return <Sd />;
-    if (isSdNew) return <Sd />;
-    return (
-      <>
-        <SideBar className={isHome ? styles["sidebar-show"] : ""} />
-        <WindowContent>
-          <Routes>
-            <Route path={Path.Home} element={<Chat />} />
-            <Route path={Path.NewChat} element={<NewChat />} />
-            <Route path={Path.Masks} element={<MaskPage />} />
-            <Route path={Path.Chat} element={<Chat />} />
-            <Route path={Path.Settings} element={<Settings />} />
-          </Routes>
-        </WindowContent>
-      </>
+    const metaDescriptionLight = document.querySelector(
+      'meta[name="theme-color"][media*="light"]',
     );
-  };
+
+    if (shouldTightBorder || isMobileScreen) {
+      if (isHome) {
+        metaDescriptionDark?.setAttribute("content", "#1b262a");
+        metaDescriptionLight?.setAttribute("content", "#e7f8ff");
+      } else {
+        metaDescriptionDark?.setAttribute("content", "#1e1e1e");
+        metaDescriptionLight?.setAttribute("content", "white");
+      }
+    } else {
+      metaDescriptionDark?.setAttribute("content", "#151515");
+      metaDescriptionLight?.setAttribute("content", "#fafafa");
+    }
+  }, [config.theme, isHome, shouldTightBorder, isMobileScreen]);
 
   return (
     <div
-      className={`${styles.container} ${
-        shouldTightBorder ? styles["tight-container"] : styles.container
-      } ${getLang() === "ar" ? styles["rtl-screen"] : ""}`}
+      className={
+        styles.container +
+        ` ${shouldTightBorder ? styles["tight-container"] : styles.container} ${
+          getLang() === "ar" ? styles["rtl-screen"] : ""
+        }`
+      }
     >
-      {renderContent()}
+      {isAuth ? (
+        <>
+          <AuthPage />
+        </>
+      ) : (
+        <>
+          <SideBar className={isHome ? styles["sidebar-show"] : ""} />
+
+          <div className={styles["window-content"]} id={SlotID.AppBody}>
+            <Routes>
+              <Route path={Path.Home} element={<Chat />} />
+              <Route path={Path.NewChat} element={<NewChat />} />
+              <Route path={Path.Masks} element={<MaskPage />} />
+              <Route path={Path.Plugins} element={<Plugins />} />
+              <Route path={Path.Chat} element={<Chat />} />
+              <Route path={Path.Settings} element={<Settings />} />
+            </Routes>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -208,7 +189,6 @@ export function useLoadData() {
 }
 
 export function Home() {
-  useSwitchTheme();
   useLoadData();
   useHtmlLang();
 

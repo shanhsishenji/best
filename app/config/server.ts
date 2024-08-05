@@ -23,12 +23,8 @@ declare global {
       CUSTOM_MODELS?: string; // to control custom models
       DEFAULT_MODEL?: string; // to control default model in every new chat window
 
-      // stability only
-      STABILITY_URL?: string;
-      STABILITY_API_KEY?: string;
-
       // azure only
-      AZURE_URL?: string; // https://{azure-url}/openai/deployments/{deploy-name}
+      AZURE_URL?: string; // https://{azure-url}/openai/deployments
       AZURE_API_KEY?: string;
       AZURE_API_VERSION?: string;
 
@@ -56,15 +52,6 @@ declare global {
       // alibaba only
       ALIBABA_URL?: string;
       ALIBABA_API_KEY?: string;
-
-      // tencent only
-      TENCENT_URL?: string;
-      TENCENT_SECRET_KEY?: string;
-      TENCENT_SECRET_ID?: string;
-
-      // moonshot only
-      MOONSHOT_URL?: string;
-      MOONSHOT_API_KEY?: string;
 
       // custom template for preprocessing user input
       DEFAULT_INPUT_TEMPLATE?: string;
@@ -120,17 +107,13 @@ export const getServerSideConfig = () => {
     if (defaultModel.startsWith("gpt-4")) defaultModel = "";
   }
 
-  const isStability = !!process.env.STABILITY_API_KEY;
-
   const isAzure = !!process.env.AZURE_URL;
   const isGoogle = !!process.env.GOOGLE_API_KEY;
   const isAnthropic = !!process.env.ANTHROPIC_API_KEY;
-  const isTencent = !!process.env.TENCENT_API_KEY;
 
   const isBaidu = !!process.env.BAIDU_API_KEY;
   const isBytedance = !!process.env.BYTEDANCE_API_KEY;
   const isAlibaba = !!process.env.ALIBABA_API_KEY;
-  const isMoonshot = !!process.env.MOONSHOT_API_KEY;
   // const apiKeyEnvVar = process.env.OPENAI_API_KEY ?? "";
   // const apiKeys = apiKeyEnvVar.split(",").map((v) => v.trim());
   // const randomIndex = Math.floor(Math.random() * apiKeys.length);
@@ -147,10 +130,6 @@ export const getServerSideConfig = () => {
     baseUrl: process.env.BASE_URL,
     apiKey: getApiKey(process.env.OPENAI_API_KEY),
     openaiOrgId: process.env.OPENAI_ORG_ID,
-
-    isStability,
-    stabilityUrl: process.env.STABILITY_URL,
-    stabilityApiKey: getApiKey(process.env.STABILITY_API_KEY),
 
     isAzure,
     azureUrl: process.env.AZURE_URL,
@@ -179,20 +158,6 @@ export const getServerSideConfig = () => {
     alibabaUrl: process.env.ALIBABA_URL,
     alibabaApiKey: getApiKey(process.env.ALIBABA_API_KEY),
 
-    isTencent,
-    tencentUrl: process.env.TENCENT_URL,
-    tencentSecretKey: getApiKey(process.env.TENCENT_SECRET_KEY),
-    tencentSecretId: process.env.TENCENT_SECRET_ID,
-
-    isMoonshot,
-    moonshotUrl: process.env.MOONSHOT_URL,
-    moonshotApiKey: getApiKey(process.env.MOONSHOT_API_KEY),
-
-    cloudflareAccountId: process.env.CLOUDFLARE_ACCOUNT_ID,
-    cloudflareKVNamespaceId: process.env.CLOUDFLARE_KV_NAMESPACE_ID,
-    cloudflareKVApiKey: getApiKey(process.env.CLOUDFLARE_KV_API_KEY),
-    cloudflareKVTTL: process.env.CLOUDFLARE_KV_TTL,
-
     gtmId: process.env.GTM_ID,
 
     needCode: ACCESS_CODES.size > 0,
@@ -208,6 +173,21 @@ export const getServerSideConfig = () => {
     disableFastLink: !!process.env.DISABLE_FAST_LINK,
     customModels,
     defaultModel,
+    isStoreFileToLocal:
+      !!process.env.NEXT_PUBLIC_ENABLE_NODEJS_PLUGIN &&
+      !process.env.R2_ACCOUNT_ID &&
+      !process.env.S3_ENDPOINT,
+
+    isEnableRAG: !!process.env.ENABLE_RAG,
+    ragEmbeddingModel:
+      process.env.RAG_EMBEDDING_MODEL ?? "text-embedding-3-large",
+    ragChunkSize: process.env.RAG_CHUNK_SIZE ?? "2000",
+    ragChunkOverlap: process.env.RAG_CHUNK_OVERLAP ?? "200",
+    ragReturnCount: process.env.RAG_RETURN_COUNT ?? "4",
     allowedWebDevEndpoints,
+
+    edgeTTSVoiceName: process.env.EDGE_TTS_VOICE_NAME ?? "zh-CN-YunxiNeural",
+    isUseOpenAIEndpointForAllModels:
+      !!process.env.USE_OPENAI_ENDPOINT_FOR_ALL_MODELS,
   };
 };

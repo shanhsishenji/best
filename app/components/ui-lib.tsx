@@ -13,15 +13,7 @@ import MinIcon from "../icons/min.svg";
 import Locale from "../locales";
 
 import { createRoot } from "react-dom/client";
-import React, {
-  CSSProperties,
-  HTMLProps,
-  MouseEvent,
-  useEffect,
-  useState,
-  useCallback,
-  useRef,
-} from "react";
+import React, { HTMLProps, useEffect, useState } from "react";
 import { IconButton } from "./button";
 
 export function Popover(props: {
@@ -55,16 +47,11 @@ export function ListItem(props: {
   children?: JSX.Element | JSX.Element[];
   icon?: JSX.Element;
   className?: string;
-  onClick?: (e: MouseEvent) => void;
-  vertical?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <div
-      className={
-        styles["list-item"] +
-        ` ${props.vertical ? styles["vertical"] : ""} ` +
-        ` ${props.className || ""}`
-      }
+      className={styles["list-item"] + ` ${props.className || ""}`}
       onClick={props.onClick}
     >
       <div className={styles["list-header"]}>
@@ -433,25 +420,17 @@ export function showPrompt(content: any, value = "", rows = 3) {
   });
 }
 
-export function showImageModal(
-  img: string,
-  defaultMax?: boolean,
-  style?: CSSProperties,
-  boxStyle?: CSSProperties,
-) {
+export function showImageModal(img: string) {
   showModal({
     title: Locale.Export.Image.Modal,
-    defaultMax: defaultMax,
     children: (
-      <div style={{ display: "flex", justifyContent: "center", ...boxStyle }}>
+      <div>
         <img
           src={img}
           alt="preview"
-          style={
-            style ?? {
-              maxWidth: "100%",
-            }
-          }
+          style={{
+            maxWidth: "100%",
+          }}
         ></img>
       </div>
     ),
@@ -463,56 +442,27 @@ export function Selector<T>(props: {
     title: string;
     subTitle?: string;
     value: T;
-    disable?: boolean;
   }>;
-  defaultSelectedValue?: T[] | T;
+  defaultSelectedValue?: T;
   onSelection?: (selection: T[]) => void;
   onClose?: () => void;
   multiple?: boolean;
 }) {
-  const [selectedValues, setSelectedValues] = useState<T[]>(
-    Array.isArray(props.defaultSelectedValue)
-      ? props.defaultSelectedValue
-      : props.defaultSelectedValue !== undefined
-      ? [props.defaultSelectedValue]
-      : [],
-  );
-
-  const handleSelection = (e: MouseEvent, value: T) => {
-    if (props.multiple) {
-      e.stopPropagation();
-      const newSelectedValues = selectedValues.includes(value)
-        ? selectedValues.filter((v) => v !== value)
-        : [...selectedValues, value];
-      setSelectedValues(newSelectedValues);
-      props.onSelection?.(newSelectedValues);
-    } else {
-      setSelectedValues([value]);
-      props.onSelection?.([value]);
-      props.onClose?.();
-    }
-  };
-
   return (
     <div className={styles["selector"]} onClick={() => props.onClose?.()}>
       <div className={styles["selector-content"]}>
         <List>
           {props.items.map((item, i) => {
-            const selected = selectedValues.includes(item.value);
+            const selected = props.defaultSelectedValue === item.value;
             return (
               <ListItem
-                className={`${styles["selector-item"]} ${
-                  item.disable && styles["selector-item-disabled"]
-                }`}
+                className={styles["selector-item"]}
                 key={i}
                 title={item.title}
                 subTitle={item.subTitle}
-                onClick={(e) => {
-                  if (item.disable) {
-                    e.stopPropagation();
-                  } else {
-                    handleSelection(e, item.value);
-                  }
+                onClick={() => {
+                  props.onSelection?.([item.value]);
+                  props.onClose?.();
                 }}
               >
                 {selected ? (
@@ -532,41 +482,6 @@ export function Selector<T>(props: {
           })}
         </List>
       </div>
-    </div>
-  );
-}
-export function FullScreen(props: any) {
-  const { children, right = 10, top = 10, ...rest } = props;
-  const ref = useRef<HTMLDivElement>();
-  const [fullScreen, setFullScreen] = useState(false);
-  const toggleFullscreen = useCallback(() => {
-    if (!document.fullscreenElement) {
-      ref.current?.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
-  }, []);
-  useEffect(() => {
-    const handleScreenChange = (e: any) => {
-      if (e.target === ref.current) {
-        setFullScreen(!!document.fullscreenElement);
-      }
-    };
-    document.addEventListener("fullscreenchange", handleScreenChange);
-    return () => {
-      document.removeEventListener("fullscreenchange", handleScreenChange);
-    };
-  }, []);
-  return (
-    <div ref={ref} style={{ position: "relative" }} {...rest}>
-      <div style={{ position: "absolute", right, top }}>
-        <IconButton
-          icon={fullScreen ? <MinIcon /> : <MaxIcon />}
-          onClick={toggleFullscreen}
-          bordered
-        />
-      </div>
-      {children}
     </div>
   );
 }
