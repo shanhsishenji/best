@@ -1416,7 +1416,7 @@ export function Settings() {
           />
         </List>
 
-        <List>
+        {/*<List>
           <STTConfigList
             sttConfig={config.sttConfig}
             updateConfig={(updater) => {
@@ -1425,7 +1425,7 @@ export function Settings() {
               config.update((config) => (config.sttConfig = sttConfig));
             }}
           />
-        </List>
+        </List>*/}
 
         <DangerItems />
       </div>
