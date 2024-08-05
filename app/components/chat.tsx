@@ -593,13 +593,13 @@ export function ChatActions(props: {
           />
         )}
 
-        {showUploadImage && (
+        {/*showUploadImage && (
           <ChatAction
             onClick={props.uploadImage}
             text={Locale.Chat.InputActions.UploadImage}
             icon={props.uploading ? <LoadingButtonIcon /> : <ImageIcon />}
           />
-        )}
+        )*/}
         {showUploadFile && (
           <ChatAction
             onClick={props.uploadFile}
